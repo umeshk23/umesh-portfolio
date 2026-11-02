@@ -1,24 +1,22 @@
 # Umesh Kushwaha — portfolio
 
-A responsive, single-page portfolio for Umesh Kushwaha. It uses semantic HTML, CSS, and vanilla JavaScript with no build step or package dependencies.
+A responsive, single-page portfolio built with semantic HTML, CSS, and vanilla JavaScript. It has no build step or package dependencies.
 
 ## Run locally
 
 From this folder, start a static server:
 
-```powershell
-python -m http.server 4173
-```
+    python -m http.server 4173
 
 Then open <http://localhost:4173>.
 
 ## Included
 
-- Editorial, portrait-led hero and warm monochrome visual system inspired by the supplied reference.
-- About, selected work, interactive technical capabilities, education, achievements, journey, and contact sections.
-- Keyboard-accessible mobile navigation and discipline tabs.
-- Motion On/Off control, scroll progress, and scroll-triggered reveals with reduced-motion support.
-- Authentic user-supplied portraits and a downloadable resume in `assets/`.
-- Project visuals explicitly labeled as conceptual diagrams where a real product screenshot was not supplied.
+- An illustrated, magenta-led hero; editorial Udaipur photo story; and distinct project, practice, journey, and contact compositions.
+- Four supplied assets in assets/redesign/: full and close illustrated portraits, a 16:9 lakeside photo, and a 9:16 mirror photo. The duplicate studio portrait from the earlier design is excluded.
+- A keyboard-accessible mobile navigation and three keyboard-operable professional-discipline tabs.
+- Motion On/Off, scroll progress, marquee, image-mask and text reveals, plus system reduced-motion support.
+- Verified education, UGC NET, Smart India Hackathon selection, profile links, repositories, live app link, and a downloadable resume.
+- Project visuals labeled as explanatory diagrams where no authentic product screenshot was supplied.
 
-The page is static and uses native scrolling. Project information follows the supplied resume and repository documentation. The PDFStudy AI live app opens at its sign-in screen; the AI Code Reviewer is labeled in progress. FitMart is not featured because its repository is a community fork and individual project contribution was not established. No phone number or changing profile statistics are published.
+The site uses native scrolling and does not add a framework or 3D dependency. PDFStudy AI’s live link opens at sign-in, and AI Code Reviewer is marked in progress. FitMart is omitted because individual contribution to the community fork is not verified.

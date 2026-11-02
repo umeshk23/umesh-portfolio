@@ -7,47 +7,47 @@ const motionLabel = document.querySelector("#motion-label");
 const menuToggle = document.querySelector(".menu-toggle");
 const primaryNav = document.querySelector(".primary-nav");
 const progressBar = document.querySelector("#progress-bar");
-const currentYear = document.querySelector("#current-year");
+const year = document.querySelector("#current-year");
 
-if (currentYear) currentYear.textContent = String(new Date().getFullYear());
+if (year) year.textContent = String(new Date().getFullYear());
 
-function getSavedMotionPreference() {
+function readMotionPreference() {
   try { return window.localStorage.getItem("umesh-portfolio-motion"); }
   catch { return null; }
 }
 
 function saveMotionPreference(value) {
   try { window.localStorage.setItem("umesh-portfolio-motion", value); }
-  catch { /* Storage can be unavailable in private browsing. */ }
+  catch { /* Storage may be unavailable. */ }
 }
 
 function setMotion(enabled) {
-  const motionOn = Boolean(enabled) && !reducedMotion.matches;
-  root.dataset.motion = motionOn ? "on" : "off";
+  const on = Boolean(enabled) && !reducedMotion.matches;
+  root.dataset.motion = on ? "on" : "off";
   if (motionToggle) {
-    motionToggle.setAttribute("aria-pressed", String(motionOn));
+    motionToggle.setAttribute("aria-pressed", String(on));
     motionToggle.disabled = reducedMotion.matches;
     motionToggle.setAttribute("aria-label", reducedMotion.matches
       ? "Motion is off because reduced motion is enabled in your system settings"
-      : `Motion ${motionOn ? "on" : "off"}. ${motionOn ? "Pause" : "Enable"} animations`);
+      : `Motion ${on ? "on" : "off"}. ${on ? "Pause" : "Enable"} animations`);
   }
   if (motionLabel) motionLabel.textContent = reducedMotion.matches
     ? "Motion off · system setting"
-    : `Motion ${motionOn ? "on · pause" : "off · enable"}`;
-  return motionOn;
+    : `Motion ${on ? "on · pause" : "off · enable"}`;
+  return on;
 }
 
-const savedMotion = getSavedMotionPreference();
-let motionOn = setMotion(!reducedMotion.matches && savedMotion !== "off");
-
+let motionOn = setMotion(!reducedMotion.matches && readMotionPreference() !== "off");
 motionToggle?.addEventListener("click", () => {
   motionOn = setMotion(!motionOn);
   saveMotionPreference(motionOn ? "on" : "off");
 });
 
-reducedMotion.addEventListener?.("change", () => {
-  motionOn = setMotion(!reducedMotion.matches && getSavedMotionPreference() !== "off");
-});
+const handleReducedMotionChange = () => {
+  motionOn = setMotion(!reducedMotion.matches && readMotionPreference() !== "off");
+};
+if (reducedMotion.addEventListener) reducedMotion.addEventListener("change", handleReducedMotionChange);
+else reducedMotion.addListener?.(handleReducedMotionChange);
 
 if (menuToggle && primaryNav) {
   const closeMenu = () => {
@@ -57,11 +57,11 @@ if (menuToggle && primaryNav) {
   };
 
   menuToggle.addEventListener("click", () => {
-    const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
-    menuToggle.setAttribute("aria-expanded", String(!isOpen));
-    menuToggle.setAttribute("aria-label", isOpen ? "Open navigation" : "Close navigation");
-    primaryNav.classList.toggle("is-open", !isOpen);
-    if (!isOpen) primaryNav.querySelector("a")?.focus({ preventScroll: true });
+    const open = menuToggle.getAttribute("aria-expanded") === "true";
+    menuToggle.setAttribute("aria-expanded", String(!open));
+    menuToggle.setAttribute("aria-label", open ? "Open navigation" : "Close navigation");
+    primaryNav.classList.toggle("is-open", !open);
+    if (!open) primaryNav.querySelector("a")?.focus({ preventScroll: true });
   });
 
   primaryNav.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
@@ -79,12 +79,17 @@ if (menuToggle && primaryNav) {
   }, { passive: true });
 }
 
-const revealItems = document.querySelectorAll(".reveal");
+const revealItems = [...document.querySelectorAll("[data-reveal]")];
 if ("IntersectionObserver" in window && revealItems.length && !reducedMotion.matches) {
   const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => entry.target.classList.toggle("is-visible", entry.isIntersecting));
-  }, { threshold: 0.035, rootMargin: "0px 0px -8% 0px" });
-  revealItems.forEach((item) => revealObserver.observe(item));
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) entry.target.classList.add("is-visible");
+    });
+  }, { threshold: 0.08, rootMargin: "0px 0px -7% 0px" });
+  revealItems.forEach((item, index) => {
+    item.style.transitionDelay = item.dataset.reveal === "line" ? `${Math.min(index % 4, 3) * 70}ms` : "";
+    revealObserver.observe(item);
+  });
 } else {
   revealItems.forEach((item) => item.classList.add("is-visible"));
 }
@@ -119,48 +124,48 @@ window.addEventListener("scroll", () => {
 window.addEventListener("resize", updatePageProgress, { passive: true });
 updatePageProgress();
 
-const capabilityTabs = [...document.querySelectorAll("[role='tab']")];
-const capabilityPanel = document.querySelector("#capability-panel");
-const capabilityTitle = document.querySelector("#capability-title");
-const capabilityDescription = document.querySelector("#capability-description");
-const capabilitySkills = document.querySelector("#capability-skills");
-const capabilityNumber = document.querySelector("#capability-number");
-const capabilityProof = document.querySelector("#capability-proof");
-const capabilityProofName = document.querySelector("#capability-proof-name");
+const tabs = [...document.querySelectorAll(".discipline-tab[role='tab']")];
+const panel = document.querySelector("#discipline-panel");
+const panelKicker = document.querySelector("#discipline-kicker");
+const panelTitle = document.querySelector("#discipline-title");
+const panelDescription = document.querySelector("#discipline-description");
+const panelSkills = document.querySelector("#discipline-skills");
+const panelProof = document.querySelector("#discipline-proof");
+const panelProofName = document.querySelector("#discipline-proof-name");
 
-function selectCapability(tab, moveFocus = false) {
-  const index = capabilityTabs.indexOf(tab);
+function selectDiscipline(tab, moveFocus = false) {
+  const index = tabs.indexOf(tab);
   if (index < 0) return;
-  capabilityTabs.forEach((item, itemIndex) => {
-    const active = itemIndex === index;
+  tabs.forEach((item, itemIndex) => {
+    const active = index === itemIndex;
     item.setAttribute("aria-selected", String(active));
     item.tabIndex = active ? 0 : -1;
   });
-  if (capabilityPanel && capabilityTitle && capabilityDescription && capabilitySkills && capabilityNumber && capabilityProof && capabilityProofName) {
-    capabilityPanel.setAttribute("aria-labelledby", tab.id);
-    capabilityTitle.textContent = tab.dataset.title || "";
-    capabilityDescription.textContent = tab.dataset.description || "";
-    capabilitySkills.textContent = tab.dataset.skills || "";
-    capabilityNumber.textContent = String(index + 1).padStart(2, "0");
-    capabilityProof.href = tab.dataset.proofHref || "#work";
-    capabilityProofName.textContent = tab.dataset.proof || "Selected work";
-    capabilityPanel.classList.remove("is-changing");
-    void capabilityPanel.offsetWidth;
-    if (motionOn) capabilityPanel.classList.add("is-changing");
+  if (panel && panelKicker && panelTitle && panelDescription && panelSkills && panelProof && panelProofName) {
+    panel.setAttribute("aria-labelledby", tab.id);
+    panelKicker.textContent = tab.dataset.kicker || "";
+    panelTitle.textContent = tab.dataset.title || "";
+    panelDescription.textContent = tab.dataset.description || "";
+    panelSkills.textContent = tab.dataset.skills || "";
+    panelProof.href = tab.dataset.proofHref || "#work";
+    panelProofName.textContent = tab.dataset.proof || "Selected work";
+    panel.classList.remove("is-changing");
+    void panel.offsetWidth;
+    if (motionOn) panel.classList.add("is-changing");
   }
   if (moveFocus) tab.focus();
 }
 
-capabilityTabs.forEach((tab, index) => {
-  tab.addEventListener("click", () => selectCapability(tab));
+tabs.forEach((tab, index) => {
+  tab.addEventListener("click", () => selectDiscipline(tab));
   tab.addEventListener("keydown", (event) => {
-    let nextIndex = index;
-    if (event.key === "ArrowDown" || event.key === "ArrowRight") nextIndex = (index + 1) % capabilityTabs.length;
-    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") nextIndex = (index - 1 + capabilityTabs.length) % capabilityTabs.length;
-    else if (event.key === "Home") nextIndex = 0;
-    else if (event.key === "End") nextIndex = capabilityTabs.length - 1;
+    let next = index;
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (index + 1) % tabs.length;
+    else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = tabs.length - 1;
     else return;
     event.preventDefault();
-    selectCapability(capabilityTabs[nextIndex], true);
+    selectDiscipline(tabs[next], true);
   });
 });
